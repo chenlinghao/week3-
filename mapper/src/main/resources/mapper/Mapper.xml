@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clh.mapper.ApplicantMapper">
+    <select id="list" resultType="map">
+        SELECT a.*,GROUP_CONCAT(j.`jname`,s.`score`) AS mscj,AVG(s.`score`) AS avgcj FROM cctv_applicant a
+        LEFT JOIN cctv_score s ON a.`aid`= s.`aid`
+        LEFT JOIN cctv_job j ON j.`jid`= s.`jid`
+        <where>
+            <if test="mohu1 != null and mohu1 != ''">
+                and a.aname like concat("%",#{mohu1},"%")
+            </if>
+            <if test="day1 != null and day1 != '' ">
+                and a.birthday >= #{day1}
+            </if>
+            <if test="day2 != null and day2 != '' ">
+                and a.birthday &lt;= #{day2}
+            </if>
+        </where>
+        GROUP BY a.`aid`
+    </select>
+    <select id="listJob" resultType="map">
+        select * from cctv_job
+    </select>
+    <insert id="addScore">
+        insert  into cctv_score values
+        (#{aid},#{jid},#{score})
+    </insert>
+    <insert id="addApplicant" useGeneratedKeys="true" keyProperty="aid">
+        insert  into cctv_applicant values
+        (null,#{aname},#{gender},#{birthday},#{college},#{major},#{edu},#{degree},now())
+    </insert>
+    <select id="listOne" resultType="map">
+        select * from cctv_applicant where aid = #{aid}
+    </select>
+    <update id="xiuApplicant">
+        update cctv_applicant 
+        <set>
+            <if test="aname != null and aname != ''">
+                aname = #{aname},
+            </if>
+            <if test="gender != null and gender != ''">
+               gender = #{gender},
+            </if>
+            <if test="birthday != null and birthday != ''">
+                birthday = #{birthday},
+            </if>
+            <if test="college != null and college != ''">
+                college = #{college},
+            </if>
+            <if test="major != null and major != ''">
+                major = #{major},
+            </if>
+            <if test="edu != null and edu != ''">
+                 edu = #{edu},
+            </if>
+            <if test="degree != null and degree != ''">
+                 aname = #{aname},
+            </if>
+            <if test="created != null and created != ''">
+                created = #{created}
+             </if>
+
+        </set>
+        WHERE aid = #{aid}
+    </update>
+    <delete id="delete">
+        delete from cctv_applicant where aid = #{aid}
+    </delete>
+    <delete id="deleteScore">
+         delete from cctv_score where aid = #{aid}
+    </delete>
+    <select id="login" resultType="com.clh.bean.User">
+        select * from user where username = #{username} and password = #{password}
+     </select>
+
+    <select id="chaUser" resultType="map">
+         select * from user where username = #{username}
+    </select>
+    <insert id="zc" useGeneratedKeys="true" keyProperty="uid">
+        insert into user values
+        (null,#{username},#{password})
+
+    </insert>
+</mapper>
